@@ -1,98 +1,138 @@
 package interfaces;
 
+import java.util.Comparator;
+
 /**
- * A generic interface representing a list data structure. Lists store
- * elements sequentially and provide operations for accessing,
- * adding, and removing elements. This interface supports operations
- * for both ordered and index-based manipulations.
+ * A generic interface representing a List data structure. This interface
+ * defines the basic behaviours required for managing a collection of
+ * elements.
  *
- * @param <T> the type of elements held in this list
+ * @param <T> the type of elements stored in the list
  */
 public interface List<T> {
 
     /**
-     * size is the logical size of the structure; that is, how many valid
-     * elements are stored within.
+     * Returns the number of elements currently stored in the list.
      *
-     * @return the number of elements stored inside the given structure
+     * @return the number of elements in the list
      */
     int size();
 
     /**
-     * If size is non-zero, then this should return false, as the container
-     * cannot be empty.
+     * Checks whether the list is empty or not.
      *
-     * @return true if empty, false otherwise
+     * @return true if the list contains no elements, false otherwise
      */
     boolean isEmpty();
 
     /**
-     * Appends t to the end of the list.
-     *
-     * @param t element to add
-     * @return true if added, false otherwise
+     * Removes all elements from the list. After invocation, the list will be empty,
+     * and its size will be reset to zero.
      */
-    boolean append(T t);
+    void clear();
 
     /**
-     * Prepends t to the beginning of the list.
+     * Inserts the specified element at the specified position in the list.
+     * Shifts the element currently at that position (if any) and any later elements
+     * to the right (increasing their indices by one).
      *
-     * @param t element to add
-     * @return true if added, false otherwise
-     */
-    boolean prepend(T t);
-
-    /**
-     * Adds t to the list at the specific idx
-     *
-     * @param t   element to add
-     * @param idx index to insert at
-     * @return true if added, false otherwise
-     * @throws IndexOutOfBoundsException if idx is out of bounds
+     * @param idx the index at which the specified element is to be inserted
+     * @param t the element to be inserted
+     * @return true if the list was modified as a result of the operation, false otherwise
+     * @throws IndexOutOfBoundsException if the index is out of range
      */
     boolean add(int idx, T t);
 
+    boolean append(T t);
+
+    boolean prepend(T t);
+
     /**
-     * Returns the element at a given index
+     * Retrieves the element stored at the specified index in the list.
      *
-     * @param idx index to access
-     * @return element at the given index
+     * @param idx the index of the element to retrieve
+     * @return the element located at the specified index
      * @throws IndexOutOfBoundsException if idx is out of bounds
      */
     T get(int idx);
 
     /**
-     * Overwrites the element at a given index and returns the old element
+     * Retrieves the first element in the list.
      *
-     * @param t   element to add
-     * @param idx index to access
-     * @return element previously at idx
-     * @throws IndexOutOfBoundsException if idx is out of bounds
+     * @return the first element in the list, or null if the list is empty
+     */
+    T getFirst();
+
+    /**
+     * Retrieves the last element in the list.
+     *
+     * @return the last element in the list, or null if the list is empty
+     */
+    T getLast();
+
+    /**
+     * Replaces the element at the specified position in the list with the specified
+     * element and returns the element previously at the specified position.
+     *
+     * @param idx the index of the element to replace
+     * @param t the element to be stored at the specified position
+     * @return the element previously at the specified position
+     * @throws IndexOutOfBoundsException if the index is out of range
      */
     T set(int idx, T t);
 
     /**
-     * Removes and returns the element at a given index
+     * Removes a single occurrence of the specified element from the list, if it is present.
+     * If the list contains one or more instances of the specified element, only the first
+     * occurrence will be removed.
      *
-     * @param idx index to access
-     * @return element removed from the given index
-     * @throws IndexOutOfBoundsException if idx is out of bounds
+     * @param o the element to be removed from the list, if present
+     * @return true if the list contained the specified element and it was successfully removed,
+     *         false otherwise
+     */
+    boolean remove(Object o);
+
+    /**
+     * Removes the element at the specified position in the list.
+     * Shifts any later elements to the left (subtracts one from their indices).
+     *
+     * @param idx the index of the element to be removed
+     * @return the element that was removed from the list
+     * @throws IndexOutOfBoundsException if the index is out of range
      */
     T remove(int idx);
 
     /**
-     * Finds and removes the first matching element
-     * Does nothing to the list if there is no such element
+     * Removes and returns the first element in the list.
+     * If the list is empty, this method may throw an exception or return null, depending on
+     * the specific implementation.
      *
-     * @return true if the element was present in the list; false otherwise
+     * @return the first element that was removed from the list or null if the list is empty
      */
-    boolean removeFirst(T t);
+    T removeFirst();
 
     /**
-     * Clears all elements from the list. That means, after calling clear(),
-     * the return of size() should be 0, and the data structure should appear
-     * to be "empty"
+     * Removes and returns the last element in the list. If the list is empty, this method
+     * may throw an exception or return null, depending on the specific implementation.
+     *
+     * @return the last element that was removed from the list or null if the list is empty
      */
-    void clear();
+    T removeLast();
 
+    /**
+     * Sorts the elements in the list according to the order induced by the specified comparator.
+     * The behaviour of this method is undefined if the specified comparator is inconsistent
+     * with equals.
+     *
+     * @param c the comparator used to determine the order of the list. A {@code null} value
+     * indicates that the elements' natural ordering should be used.
+     */
+    void sort(Comparator<? super T> c);
+
+    /**
+     * Converts the contents of the list into an array.
+     *
+     * @return an array containing all the elements of the list in a proper sequence
+     */
+    Object[] toArray();
 }

@@ -4,8 +4,14 @@ package containers;
  * Each node holds a reference to its data, the next node, and the previous node.
  */
 public class Node<T> {
+    /**
+     * Data stored in the node
+     */
     private T data;
-    private Node<T> prev;
+
+    /**
+     * Pointer to the next Node
+     */
     private Node<T> next;
 
     /**
@@ -16,7 +22,6 @@ public class Node<T> {
     public Node(T data) {
         this.data = data;
         this.next = null;
-        this.prev = null;
     }
 
     /**
@@ -35,24 +40,6 @@ public class Node<T> {
      */
     public void setData(T newData) {
         this.data = newData;
-    }
-
-    /**
-     * Retrieves the previous node referenced by this node in a doubly linked list.
-     *
-     * @return The previous node of type Node, or null if there is no previous node.
-     */
-    public Node<T> getPrev() {
-        return prev;
-    }
-
-    /**
-     * Sets the previous node reference for this node in the doubly linked list.
-     *
-     * @param prev The node to be set as the previous node. It can be null if there is no previous node.
-     */
-    public void setPrev(Node<T> prev) {
-        this.prev = prev;
     }
 
     /**
