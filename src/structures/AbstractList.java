@@ -29,6 +29,22 @@ public abstract class AbstractList<T> implements List<T> {
         return size == 0;
     }
 
+    /**
+     * Adds all elements from the specified list to the current list.
+     * Each element in the provided list is appended to the current list
+     * in the order they appear.
+     *
+     * @param list The list of elements to be added. Must not be null.
+     * @return {@code true} if all elements from the list were successfully added.
+     */
+    public boolean addAll(List<T> list) {
+        for (int i = 0; i < list.size(); i++) {
+            append(list.get(i));
+        }
+
+        return true;
+    }
+
     @Override
     public Object[] toArray() {
         Object[] arr = new Object[size];

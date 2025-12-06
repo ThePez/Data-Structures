@@ -31,6 +31,46 @@ public class ArrayList<T> extends AbstractList<T> implements List<T> {
     }
 
     /**
+     * Constructs an ArrayList with an initial capacity.
+     * The capacity represents the number of elements the ArrayList can hold
+     * before needing to resize. If the provided initial capacity is less than
+     * or equal to 0, an IllegalArgumentException will be thrown.
+     *
+     * @param initialCapacity The initial capacity of the ArrayList. Must be positive.
+     * @throws IllegalArgumentException if the initial capacity is less than or equal to 0.
+     */
+    @SuppressWarnings("unchecked")
+    public ArrayList(int initialCapacity) {
+        if (initialCapacity <= 0) {
+            throw new IllegalArgumentException("Initial capacity must be positive.");
+        }
+
+        capacity = initialCapacity;
+        data = (T[]) new Object[capacity];
+        size = 0;
+    }
+
+    /**
+     * Constructs a new ArrayList with the elements of the specified list. The new ArrayList
+     * will have an initial capacity equal to the size of the provided list, or a default
+     * capacity of 10 if the specified list is null. The elements from the provided list
+     * are copied into the new ArrayList.
+     *
+     * @param list The list whose elements are to be placed into this ArrayList. If the
+     *             specified list is null, the ArrayList will be initialised with the default
+     *             capacity and contain no elements.
+     */
+    public ArrayList(List<T> list) {
+        this(list == null ? 10 : list.size());
+
+        if (list != null) {
+            for (int i = 0; i < size; i++) {
+                data[i] = list.get(i);
+            }
+        }
+    }
+
+    /**
      * Retrieves the current capacity of the array.
      *
      * @return the number of elements the array can currently hold without resizing.

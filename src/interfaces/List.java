@@ -43,8 +43,29 @@ public interface List<T> {
      */
     boolean add(int idx, T t);
 
+    /**
+     * Adds all elements from the specified list to the current list.
+     *
+     * @param list the list containing elements to be added to this list
+     * @return true if the list was modified as a result of this operation, false otherwise
+     */
+    boolean addAll(List<T> list);
+
+    /**
+     * Appends the specified element to the end of the list.
+     *
+     * @param t the element to be appended to the list
+     * @return true if the list was modified as a result of this operation, false otherwise
+     */
     boolean append(T t);
 
+    /**
+     * Inserts the specified element at the beginning of the list.
+     * Shifts the existing elements to the right to make room for the new element.
+     *
+     * @param t the element to be added at the beginning of the list
+     * @return true if the list was modified as a result of this operation, false otherwise
+     */
     boolean prepend(T t);
 
     /**
