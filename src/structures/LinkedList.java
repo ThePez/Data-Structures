@@ -2,8 +2,8 @@ package structures;
 
 import containers.Node;
 import interfaces.List;
-
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * A generic implementation of a singly linked list, which provides
@@ -13,7 +13,14 @@ import java.util.Comparator;
  * @param <T> the type of elements held in this linked list
  */
 public class LinkedList<T> extends AbstractList<T> implements List<T> {
+    /**
+     * The head reference of the linked list.
+     */
     private Node<T> head;
+
+    /**
+     * The tail reference of the linked list.
+     */
     private Node<T> tail;
 
     /**
@@ -28,28 +35,34 @@ public class LinkedList<T> extends AbstractList<T> implements List<T> {
 
     @Override
     public boolean append(T e) {
+        if (isEmpty()) {
+            return emptyInsert(e);
+        }
+
         return insert(e, true);
     }
 
     @Override
     public boolean prepend(T e) {
-       return insert(e, false);
+        if (isEmpty()) {
+            return emptyInsert(e);
+        }
+
+        return insert(e, false);
     }
 
     @Override
     public boolean add(int idx, T e) {
-        if (checkIndex(idx)) {
-            return false;
-        }
-
         if (idx == 0) {
             return prepend(e);
         } else if (idx == size) {
             return append(e);
+        } else if (checkIndex(idx)) {
+            return false;
         }
 
         Node<T> current = head;
-        for (int i = 0; i < idx; i++) {
+        for (int i = 0; i < idx - 1; i++) {
             current = current.getNext();
         }
 
@@ -129,55 +142,30 @@ public class LinkedList<T> extends AbstractList<T> implements List<T> {
             return false;
         }
 
-        Node<T> prev = null;
-        Node<T> current = head;
-        while (current != null && !current.getData().equals(o)) {
-            prev = current;
-            current = current.getNext();
-        }
-
-        if (current == null) {
-            return false;
-        }
-
-        if (prev == null) {
-            head = current.getNext();
-            if (size == 1) {
-                head = tail = null;
+        Node<T> currentNode = head;
+        Node<T> prevNode = null;
+        while (currentNode != null) {
+            // "Objects.equals" handles null data
+            if (Objects.equals(currentNode.getData(), o)) {
+                removeNode(currentNode, prevNode);
+                return true;
             }
-        } else {
-            prev.setNext(current.getNext());
-            if (current == tail) {
-                tail = prev;
-            }
+
+            // Get the next node
+            prevNode = currentNode;
+            currentNode = currentNode.getNext();
         }
 
-        size--;
-        return true;
+        return false;
     }
 
     @Override
     public T remove(int idx) {
-        if (checkIndex(idx)) {
+        if (idx < 0 || idx >= size) {
             return null;
         }
 
-        if (idx == 0) {
-            T data = head.getData();
-            head = head.getNext();
-            size--;
-            return data;
-        }
-
-        Node<T> current = head;
-        for (int i = 0; i < idx; i++) {
-            current = current.getNext();
-        }
-
-        Node<T> next = current.getNext();
-        current.setNext(next.getNext());
-        size--;
-        return next.getData();
+        return removeNode(idx).getData();
     }
 
     @Override
@@ -202,6 +190,80 @@ public class LinkedList<T> extends AbstractList<T> implements List<T> {
     }
 
     /**
+     * Retrieves the node at the specified index within the linked list.
+     * Iterates through the nodes starting from the head to find the node at the given index.
+     *
+     * @param index The position of the node to retrieve, starting from 0.
+     * @return The node at the specified index if it exists, or null if the end of the list is reached.
+     * @throws IndexOutOfBoundsException if the index is out of bounds.
+     */
+    private Node<T> getNode(int index) {
+        if (checkIndex(index)) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        int currentIndex;
+        Node<T> currentNode;
+        currentIndex = 0;
+        currentNode = this.head;
+        while (currentNode != null && currentIndex != index) {
+            currentNode = currentNode.getNext();
+            currentIndex++;
+        }
+
+        return currentNode;
+    }
+
+    /**
+     * Removes a specified node from the linked list by updating references to bypass
+     * the node. Adjusts the head and tail of the list if the removed node is the first
+     * or last node. Decrements the size of the list.
+     *
+     * @param node The node to be removed from the linked list.
+     * @param prev The previous node preceding the node to be removed. If the node to
+     *             be removed is the head, this parameter should be null.
+     * @return The node that was removed from the linked list.
+     */
+    private Node<T> removeNode(Node<T> node, Node<T> prev) {
+        Node<T> next = node.getNext();
+        if (prev != null) {
+            // Next node or null if setting new tail
+            prev.setNext(next);
+        } else {
+            // No previous node -> setting new head
+            head = next;
+        }
+
+        if (next == null) {
+            // No next node -> setting new tail
+            tail = prev;
+        }
+
+        size--;
+        return node;
+    }
+
+    /**
+     * Removes the node at the specified index within the linked list.
+     * If the index is zero, the head node is removed. Otherwise,
+     * the method retrieves the node preceding the target node, then updates
+     * pointers appropriately to exclude the node at the specified index
+     * from the list.
+     *
+     * @param index The position of the node to remove, starting from 0.
+     * @return The removed node at the specified index.
+     */
+    private Node<T> removeNode(int index) {
+        if (index == 0) {
+            return removeNode(getNode(0), null);
+
+        }
+
+        Node<T> prev = getNode(index - 1);
+        return removeNode(prev.getNext(), prev);
+    }
+
+    /**
      * Inserts a new element into the linked list. Depending on the value of the
      * {@code append} parameter, the element is either added to the head or the tail
      * of the list.
@@ -210,7 +272,7 @@ public class LinkedList<T> extends AbstractList<T> implements List<T> {
      * @param append A boolean flag indicating whether to append the element to the tail
      *               ({@code true}) or prepend it to the head ({@code false}) of the list.
      */
-    private boolean insert(T e, boolean append) {
+    protected boolean insert(T e, boolean append) {
         if (isEmpty()) {
             return emptyInsert(e);
         }
@@ -237,7 +299,7 @@ public class LinkedList<T> extends AbstractList<T> implements List<T> {
      *
      * @param e the data to store in the new Node
      */
-    private boolean emptyInsert(T e) {
+    protected boolean emptyInsert(T e) {
         try {
             head = tail = new Node<>(e);
             size = 1;

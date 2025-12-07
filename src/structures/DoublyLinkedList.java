@@ -33,24 +33,6 @@ public class DoublyLinkedList<T> extends LinkedList<T> implements List<T> {
     }
 
     @Override
-    public boolean append(T t) {
-        if (isEmpty()) {
-            return emptyInsert(t);
-        }
-
-        return insert(t, true);
-    }
-
-    @Override
-    public boolean prepend(T t) {
-        if (isEmpty()) {
-            return  emptyInsert(t);
-        }
-
-        return insert(t, false);
-    }
-
-    @Override
     public boolean add(int index, T data) {
         if (index == 0) { // Case 1: The index is the head
             return prepend(data);
@@ -219,7 +201,7 @@ public class DoublyLinkedList<T> extends LinkedList<T> implements List<T> {
      *               if false, the element is prepended to the beginning of the list
      * @return true if the insertion was successful, false if an OutOfMemoryError occurs
      */
-    private boolean insert(T t, boolean append) {
+    protected boolean insert(T t, boolean append) {
         if (isEmpty()) {
             return emptyInsert(t);
         }
@@ -251,7 +233,7 @@ public class DoublyLinkedList<T> extends LinkedList<T> implements List<T> {
      * @param t the element to be added to the linked list
      * @return true if the insertion was successful, false if an OutOfMemoryError occurs
      */
-    private boolean emptyInsert(T t) {
+    protected boolean emptyInsert(T t) {
         try {
             head = tail = new DoubleNode<>(t);
             size = 1;
