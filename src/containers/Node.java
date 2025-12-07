@@ -7,7 +7,7 @@ public class Node<T> {
     /**
      * Data stored in the node
      */
-    private T data;
+    protected T data;
 
     /**
      * Pointer to the next Node

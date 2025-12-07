@@ -75,6 +75,24 @@ public class DoublyLinkedList<T> extends LinkedList<T> implements List<T> {
     }
 
     @Override
+    public T getFirst() {
+        if (isEmpty()) {
+            return null;
+        }
+
+        return head.getData();
+    }
+
+    @Override
+    public T getLast() {
+        if (isEmpty()) {
+            return null;
+        }
+
+        return tail.getData();
+    }
+
+    @Override
     public T set(int index, T t) {
         DoubleNode<T> node = getNode(index);
         T oldData = node.getData();
@@ -94,26 +112,15 @@ public class DoublyLinkedList<T> extends LinkedList<T> implements List<T> {
         }
 
         DoubleNode<T> currentNode = head;
-        boolean remove = false;
         while (currentNode != null) {
             // "Objects.equals" handles null data
             if (Objects.equals(currentNode.getData(), t)) {
-                remove = true;
-                break;
+                removeNode(currentNode);
+                return true;
             }
 
             // Get the next node
             currentNode = currentNode.getNext();
-        }
-
-        // Data match was found -> remove the node and return true
-        if (remove) {
-            DoubleNode<T> prev = currentNode.getPrev();
-            DoubleNode<T> next = currentNode.getNext();
-            prev.setNext(next);
-            next.setPrev(prev);
-            size--;
-            return true;
         }
 
         return false;
@@ -156,6 +163,38 @@ public class DoublyLinkedList<T> extends LinkedList<T> implements List<T> {
     }
 
     /**
+     * Removes the specified node from the doubly linked list. Updates the pointers
+     * of the adjacent nodes as necessary and adjusts the head or tail references
+     * if the removed node is at the beginning or the end of the list. Decreases the
+     * size of the list by one.
+     *
+     * @param node the node to be removed from the list
+     * @return the removed node
+     */
+    private DoubleNode<T> removeNode(DoubleNode<T> node) {
+        DoubleNode<T> prev = node.getPrev();
+        DoubleNode<T> next = node.getNext();
+        if (prev != null) {
+            // Next node or null if setting new tail
+            prev.setNext(next);
+        } else {
+            // No previous node -> setting new head
+            head = next;
+        }
+
+        if (next != null) {
+            // Previous node or null if setting new head
+            next.setPrev(prev);
+        } else {
+            // No next node -> setting new tail
+            tail = prev;
+        }
+
+        size--;
+        return node;
+    }
+
+    /**
      * Removes the node at the specified index from the doubly linked list.
      * Updates the previous and next pointers of adjacent nodes as necessary
      * and adjusts the head or tail references if the removed node was at the
@@ -166,29 +205,7 @@ public class DoublyLinkedList<T> extends LinkedList<T> implements List<T> {
      * @throws IndexOutOfBoundsException if the index is out of bounds
      */
     private DoubleNode<T> removeNode(int index) {
-        DoubleNode<T> node = getNode(index); // handles bad index's
-        DoubleNode<T> prev = node.getPrev();
-        DoubleNode<T> next = node.getNext();
-        if (prev != null) {
-            // Next node or null if setting new tail
-            prev.setNext(next);
-        }
-
-        if (next != null) {
-            // Previous node or null if setting new head
-            next.setPrev(prev);
-        }
-
-        if (index == 0) {
-            head = next;
-        }
-
-        if (index == size - 1) {
-            tail = prev;
-        }
-
-        size--;
-        return node;
+        return removeNode(getNode(index));
     }
 
     /**

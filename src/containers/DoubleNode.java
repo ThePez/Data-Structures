@@ -24,6 +24,9 @@ public class DoubleNode<T> extends Node<T>{
      */
     public DoubleNode(T data) {
         super(data);
+        this.data = data;
+        prev = null;
+        next = null;
     }
 
     /**

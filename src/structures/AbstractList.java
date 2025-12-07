@@ -34,6 +34,17 @@ public abstract class AbstractList<T> implements List<T> {
         return size == 0;
     }
 
+    @Override
+    public boolean contains(Object o) {
+        for (int i = 0; i < size; i++) {
+            if (get(i).equals(o)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Adds all elements from the specified list to the current list. Each element
      * in the provided list is appended to the current list in the order they appear.

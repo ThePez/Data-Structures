@@ -78,6 +78,14 @@ public interface List<T> {
     T get(int idx);
 
     /**
+     * Checks if the list contains the specified element.
+     *
+     * @param o the element to be checked for presence in the list
+     * @return true if the list contains the specified element, false otherwise
+     */
+    boolean contains(Object o);
+
+    /**
      * Retrieves the first element in the list.
      *
      * @return the first element in the list, or null if the list is empty
