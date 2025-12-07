@@ -56,8 +56,8 @@ public class KdTree<T extends HasPoint> {
         List<T> byY = new ArrayList<>(points);
 
         // Pre-Sort the List of tunnels by both x and y
-        byX.sort(Comparator.comparingInt(HasPoint::getX));
-        byY.sort(Comparator.comparingInt(HasPoint::getY));
+        byX.sort(Comparator.comparingInt(HasPoint::x));
+        byY.sort(Comparator.comparingInt(HasPoint::y));
 
         // Build the tree
         root = build(byX, byY, 0);
@@ -80,8 +80,8 @@ public class KdTree<T extends HasPoint> {
 
         // First get bounding box for the tunnel
         radius += 0.000001;
-        int x = ref.getX();
-        int y = ref.getY();
+        int x = ref.x();
+        int y = ref.y();
         double radiusSquared = Math.pow(radius, 2);
         double boxMinX = x - radius;
         double boxMaxX = x + radius;
@@ -99,8 +99,8 @@ public class KdTree<T extends HasPoint> {
 
             // Get the centre point for the tunnel stored in the node
             T v = current.value;
-            int queryX = v.getX();
-            int queryY = v.getY();
+            int queryX = v.x();
+            int queryY = v.y();
 
             // Make sure the objects are different instances
             if (!ref.equals(v)) {
@@ -221,36 +221,58 @@ public class KdTree<T extends HasPoint> {
                         List<T> leftOther, List<T> rightOther, boolean byX) {
         int mid = split.size() / 2;
         // Partition the currently selected split axis around the median
+        T midPoint = split.get(mid);
         for (int i = 0; i < split.size(); i++) {
-            if (i < mid) {
-                leftSplit.append(split.get(i));
-            } else if (i > mid){
-                rightSplit.append(split.get(i));
+            if (i == mid) {
+                continue;
             }
+
+            partitionHelper(split, leftSplit, rightSplit, byX, midPoint, i);
+
         }
 
-        T midPoint = split.get(mid);
         for (int i = 0; i < other.size(); i++) {
             if (other.get(i).equals(midPoint)) {
                 continue;
             }
 
-            if (byX) {
-                if (other.get(i).getX() <= midPoint.getX()) {
-                    leftOther.append(other.get(i));
-                } else {
-                    rightOther.append(other.get(i));
-                }
-            } else {
-                if (other.get(i).getY() <= midPoint.getY()) {
-                    leftOther.append(other.get(i));
-                } else {
-                    rightOther.append(other.get(i));
-                }
-            }
+            partitionHelper(other, leftOther, rightOther, byX, midPoint, i);
         }
 
         return midPoint;
+    }
+
+    /**
+     * Helper method to partition elements from the given list into left and right subsets
+     * based on a midpoint and a specified axis (x or y). The method evaluates each element
+     * in the list and appends it to the respective left or right subset based on its coordinate
+     * relative to the midpoint.
+     *
+     * @param split the list of elements to be partitioned into left and right subsets
+     * @param leftSplit the list to store elements from the split list that are less than or equal
+     *                  to the midpoint on the specified axis
+     * @param rightSplit the list to store elements from the split list that are greater than
+     *                   the midpoint on the specified axis
+     * @param byX flag indicating whether to partition based on the x-coordinate (true)
+     *            or y-coordinate (false)
+     * @param midPoint the element representing the midpoint used for partitioning the split list
+     * @param i the index of the current element in the split list being evaluated
+     */
+    private void partitionHelper(List<T> split, List<T> leftSplit, List<T> rightSplit, boolean byX,
+                                 T midPoint, int i) {
+        if (byX) {
+            if (split.get(i).x() <= midPoint.x()) {
+                leftSplit.append(split.get(i));
+            } else {
+                rightSplit.append(split.get(i));
+            }
+        } else {
+            if (split.get(i).y() <= midPoint.y()) {
+                leftSplit.append(split.get(i));
+            } else {
+                rightSplit.append(split.get(i));
+            }
+        }
     }
 
     /**

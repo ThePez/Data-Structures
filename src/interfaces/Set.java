@@ -33,7 +33,7 @@ public interface Set<K> {
      * @param key the key whose presence in the map is to be tested
      * @return true if the map contains a mapping for the key, false otherwise
      */
-    boolean contains(K key);
+    boolean get(K key);
 
     /**
      * Adds the specified key to the collection.
@@ -51,11 +51,4 @@ public interface Set<K> {
      */
     boolean remove(K key);
 
-    /**
-     * Retrieves a list of all keys currently stored in the collection.
-     *
-     * @return a list containing all keys in the collection. The order of keys
-     *         may depend on the specific implementation.
-     */
-    List<K> getKeys();
 }

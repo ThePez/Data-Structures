@@ -71,7 +71,7 @@ public class ArrayList<T> extends AbstractList<T> implements List<T> {
      */
     @SuppressWarnings("unchecked")
     public ArrayList(List<T> list) {
-        this(list == null ? 10 : list.size());
+        this(list == null ? 10 : !list.isEmpty() ? list.size() : 10);
 
         if (list != null) {
             data = (T[]) list.toArray();

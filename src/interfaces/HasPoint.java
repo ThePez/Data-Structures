@@ -10,12 +10,12 @@ public interface HasPoint {
      *
      * @return the x-coordinate as an integer
      */
-    int getX();
+    int x();
 
     /**
      * Returns the y-coordinate of a point.
      *
      * @return the y-coordinate as an integer
      */
-    int getY();
+    int y();
 }

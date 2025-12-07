@@ -165,6 +165,7 @@ public class LinkedList<T> extends AbstractList<T> implements List<T> {
         if (idx == 0) {
             T data = head.getData();
             head = head.getNext();
+            size--;
             return data;
         }
 

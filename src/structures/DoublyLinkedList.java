@@ -112,6 +112,7 @@ public class DoublyLinkedList<T> extends LinkedList<T> implements List<T> {
             DoubleNode<T> next = currentNode.getNext();
             prev.setNext(next);
             next.setPrev(prev);
+            size--;
             return true;
         }
 
