@@ -19,6 +19,11 @@ public abstract class AbstractList<T> implements List<T> {
      */
     protected int size;
 
+    /**
+     * The internal array used to store the elements in the list.
+     */
+    protected T[] data;
+
     @Override
     public int size() {
         return size;
@@ -30,18 +35,39 @@ public abstract class AbstractList<T> implements List<T> {
     }
 
     /**
-     * Adds all elements from the specified list to the current list.
-     * Each element in the provided list is appended to the current list
-     * in the order they appear.
+     * Adds all elements from the specified list to the current list. Each element
+     * in the provided list is appended to the current list in the order they appear.
      *
-     * @param list The list of elements to be added. Must not be null.
-     * @return {@code true} if all elements from the list were successfully added.
+     * @param list the list containing elements to be added. If the list is null,
+     *             no elements are added, and the method returns false.
+     * @return true if all elements from the list were successfully added, false otherwise.
      */
     public boolean addAll(List<T> list) {
+        if (list == null) {
+            return false;
+        }
+
         for (int i = 0; i < list.size(); i++) {
             append(list.get(i));
         }
 
+        return true;
+    }
+
+    /**
+     * Adds all elements from the specified array to the current list.
+     * Each element in the provided array is appended to the current list
+     * in the order they appear.
+     *
+     * @param list An array of elements to be added. If the array is null, the method will return false.
+     * @return true if all elements from the array were successfully added, false otherwise.
+     */
+    public boolean addAll(T[] list) {
+        if (list == null) {
+            return false;
+        }
+
+        System.arraycopy(list, 0, data, size, list.length);
         return true;
     }
 

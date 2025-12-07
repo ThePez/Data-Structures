@@ -7,7 +7,14 @@ package interfaces;
  *
  * @param <T> the type of elements held in this priority queue
  */
-public interface PriorityQueue<T> {
+public interface PriorityQueue<T extends Comparable<T>> {
+
+    /**
+     * Checks whether the structure contains any elements.
+     *
+     * @return true if the structure is empty; false otherwise
+     */
+    boolean isEmpty();
 
     /**
      * Adds the specified element to the heap.
@@ -60,5 +67,12 @@ public interface PriorityQueue<T> {
      * @return an array containing all the elements of the structure
      */
     Object[] toArray();
+
+    /**
+     * Sorts the elements stored in this priority queue in the heap order.
+     *
+     * @return a list containing all elements of the priority queue, sorted heap order.
+     */
+    List<T> sort();
 
 }

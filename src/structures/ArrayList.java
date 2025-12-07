@@ -16,11 +16,6 @@ public class ArrayList<T> extends AbstractList<T> implements List<T> {
     private int capacity;
 
     /**
-     * Data stores the raw objects
-     */
-    private T[] data;
-
-    /**
      * Constructs an empty Dynamic Array
      */
     @SuppressWarnings("unchecked")
@@ -51,6 +46,20 @@ public class ArrayList<T> extends AbstractList<T> implements List<T> {
     }
 
     /**
+     * Constructs a new ArrayList with the elements of the specified array.
+     * The new ArrayList will have an initial capacity equal to the size of the provided array.
+     * The elements from the provided array are copied into the new ArrayList.
+     *
+     * @param array The array whose elements are to be placed into this ArrayList.
+     *              If the provided array is null, an exception will be thrown.
+     */
+    public ArrayList(T[] array) {
+        this(array.length);
+        System.arraycopy(array, 0, data, 0, array.length);
+        size = array.length;
+    }
+
+    /**
      * Constructs a new ArrayList with the elements of the specified list. The new ArrayList
      * will have an initial capacity equal to the size of the provided list, or a default
      * capacity of 10 if the specified list is null. The elements from the provided list
@@ -60,13 +69,13 @@ public class ArrayList<T> extends AbstractList<T> implements List<T> {
      *             specified list is null, the ArrayList will be initialised with the default
      *             capacity and contain no elements.
      */
+    @SuppressWarnings("unchecked")
     public ArrayList(List<T> list) {
         this(list == null ? 10 : list.size());
 
         if (list != null) {
-            for (int i = 0; i < size; i++) {
-                data[i] = list.get(i);
-            }
+            data = (T[]) list.toArray();
+            size = list.size();
         }
     }
 
