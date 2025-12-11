@@ -126,6 +126,27 @@ public class TestArrayList {
         list.get(0);
     }
 
+    @Test
+    public void testGetAtIndex() {
+        list.append(1);
+        list.append(2);
+        list.append(3);
+
+        assertEquals((Integer)2, list.get(1));
+        assertEquals((Integer)3, list.get(2));
+        assertEquals(3, list.size());
+    }
+
+    @Test
+    public void testContains() {
+        list.append(1);
+        list.append(2);
+        list.append(3);
+
+        assertTrue(list.contains(2));
+        assertFalse(list.contains(4));
+    }
+
     // ------------------ Set ------------------
 
     @Test

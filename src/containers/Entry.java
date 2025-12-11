@@ -101,7 +101,7 @@ public class Entry<K, V> implements KVEntryInterface<K, V> {
         }
 
         Entry<?, ?> other = (Entry<?, ?>) obj;
-        return Objects.equals(this.key,other.key) && Objects.equals(this.value, other.value);
+        return Objects.equals(this.key, other.key) && Objects.equals(this.value, other.value);
     }
 
     /**
@@ -113,4 +113,5 @@ public class Entry<K, V> implements KVEntryInterface<K, V> {
     public int hashCode() {
         return this.key.hashCode();
     }
+
 }

@@ -9,41 +9,17 @@ package containers;
  * @param <K> the type of the key
  * @param <V> the type of the value
  */
-public class ArrayEntry<K extends Comparable<K>, V extends Comparable<V>> extends Entry<K, V>
+public class ArrayEntry<K extends Comparable<K>, V> extends Entry<K, V>
         implements Comparable<ArrayEntry<K, V>> {
-    /**
-     * The index of this node within the array.
-     */
-    private int index;
 
     /**
-     * Constructs a new Node instance with the specified key and value. The index is initialised to
-     * -1.
+     * Constructs an ArrayEntry object that stores a key-value pair.
      *
-     * @param key the key associated with this node
-     * @param value the value associated with this node
+     * @param key The key to be associated with the entry. Must be of type K.
+     * @param value The value to be stored with the key in the entry. Must be of type V.
      */
     public ArrayEntry(K key, V value) {
         super(key, value);
-        index = -1;
-    }
-
-    /**
-     * Sets the index of this node.
-     *
-     * @param idx the new index to be associated with this node
-     */
-    public void setIndex(int idx) {
-        index = idx;
-    }
-
-    /**
-     * Retrieves the index of this node.
-     *
-     * @return the index of this node
-     */
-    public int getIndex() {
-        return index;
     }
 
     /**

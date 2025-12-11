@@ -8,7 +8,7 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 /**
- * JUnit 4 test suite for DynamicHeap class
+ * JUnit 4 test suite for PQHeap
  */
 public class TestPQHeap {
 

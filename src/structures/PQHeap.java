@@ -18,12 +18,12 @@ public class PQHeap<T extends Comparable<T>> implements PriorityQueue<T> {
      * are added beyond its current capacity. The elements are of a generic type, allowing the heap
      * to store objects of any type.
      */
-    private final List<T> data;
+    protected final List<T> data;
 
     /**
      * Indicates whether the heap is configured to operate as a max-heap.
      */
-    private boolean maxHeap = false;
+    protected boolean maxHeap = false;
 
     /**
      * Constructs a new instance of PQHeap with default settings.
@@ -114,14 +114,18 @@ public class PQHeap<T extends Comparable<T>> implements PriorityQueue<T> {
         }
 
         // Find the first matching element
-        for (int i = 0; i < data.size(); i++) {
+        int currentSize = data.size();
+        for (int i = 0; i < currentSize; i++) {
             if (data.get(i).equals(element)) {
                 // Found the element, so remove it by overriding it with the last element
                 swapElements(data, i, data.size() - 1);
                 data.removeLast();
                 // Now fix any violations in the Heap caused by the swapped last element
-                downHeap(data, i, data.size()); // Check down first
-//                upHeap(data, i); // Then check up
+                if (i < currentSize - 1) {
+                    downHeap(data, i, data.size()); // Check down first
+                    upHeap(data, i); // Then check up
+                }
+
                 return true;
             }
         }
@@ -140,7 +144,20 @@ public class PQHeap<T extends Comparable<T>> implements PriorityQueue<T> {
 
     @Override
     public T poll() {
-        return pop(data, data.size());
+        T value;
+        int size = data.size();
+        switch (size) {
+            case 0 -> value = null;
+            case 1 -> value = data.removeFirst();
+            default -> {
+                value = data.get(0);
+                swapElements(data, 0, size - 1);
+                data.removeLast();
+                downHeap(data, 0, size - 1);
+            }
+        }
+
+        return value;
     }
 
     @Override
@@ -217,31 +234,6 @@ public class PQHeap<T extends Comparable<T>> implements PriorityQueue<T> {
      */
     protected int rightChild(int index) {
         return 2 * index + 2;
-    }
-
-    /**
-     * Removes and returns the root element of the heap while maintaining the heap property.
-     * The method adjusts the heap's internal structure after removal to ensure the heap remains
-     * valid.
-     *
-     * @param array the array representing the heap
-     * @param size  the current size of the heap
-     * @return the root element of the heap if it exists, or null if the heap is empty
-     */
-    protected T pop(List<T> array, int size) {
-        T value;
-        switch (size) {
-            case 0 -> value = null;
-            case 1 -> value = array.removeFirst();
-            default -> {
-                value = array.get(0);
-                swapElements(array, 0, size - 1);
-                array.removeLast();
-                downHeap(array, 0, size - 1);
-            }
-        }
-
-        return value;
     }
 
     /**
