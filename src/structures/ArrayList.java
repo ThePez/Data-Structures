@@ -36,11 +36,11 @@ public class ArrayList<T> extends AbstractList<T> implements List<T> {
      */
     @SuppressWarnings("unchecked")
     public ArrayList(int initialCapacity) {
-        if (initialCapacity <= 0) {
+        if (initialCapacity < 0) {
             throw new IllegalArgumentException("Initial capacity must be positive.");
         }
 
-        capacity = initialCapacity;
+        capacity = (initialCapacity == 0) ? 10 : initialCapacity;
         data = (T[]) new Object[capacity];
         size = 0;
     }

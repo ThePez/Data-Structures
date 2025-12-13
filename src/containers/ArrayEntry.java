@@ -13,24 +13,38 @@ public class ArrayEntry<K extends Comparable<K>, V> extends Entry<K, V>
         implements Comparable<ArrayEntry<K, V>> {
 
     /**
-     * Constructs an ArrayEntry object that stores a key-value pair.
+     * Index of the entry in the underlying array.
+     */
+    private int index = -1;
+
+    /**
+     * Constructs a new ArrayEntry instance with the specified key and value.
      *
-     * @param key The key to be associated with the entry. Must be of type K.
-     * @param value The value to be stored with the key in the entry. Must be of type V.
+     * @param key The key associated with the entry. It must implement the Comparable interface.
+     * @param value The value associated with the entry.
      */
     public ArrayEntry(K key, V value) {
         super(key, value);
     }
 
     /**
-     * Compares this ArrayNode to another ArrayNode based on their keys.
-     * The comparison is performed using the natural ordering of the keys,
-     * as defined by the {@code compareTo} method of the key's type.
+     * Retrieves the index of this entry in the underlying array.
      *
-     * @param other the ArrayNode to be compared with this ArrayNode
-     * @return a negative integer, zero, or a positive integer as this ArrayNode's key
-     *         is less than, equal to, or greater than the specified ArrayNode's key
+     * @return The index of this entry, represented as an integer.
      */
+    public int getIndex() {
+        return index;
+    }
+
+    /**
+     * Updates the index of this entry in the underlying array.
+     *
+     * @param index The new index to be set for this entry. Must be a non-negative integer.
+     */
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
     @Override
     public int compareTo(ArrayEntry<K, V> other) {
         return key.compareTo(other.getKey());

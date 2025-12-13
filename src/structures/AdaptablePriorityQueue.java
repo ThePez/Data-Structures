@@ -19,12 +19,6 @@ public class AdaptablePriorityQueue<T> extends
         PQHeap<ArrayEntry<Integer, T>> implements PriorityQueue<ArrayEntry<Integer, T>> {
 
     /**
-     * Maintains the mapping of each element in the priority queue to
-     * its current index within the underlying heap structure.
-     */
-    private final HashMap<ArrayEntry<Integer, T>, Integer> positions = new HashMap<>();
-
-    /**
      * Constructs a new instance of AdaptablePriorityQueue with default settings.
      * This constructor initializes the priority queue as an empty min-heap that
      * can efficiently adapt to element updates.
@@ -75,7 +69,9 @@ public class AdaptablePriorityQueue<T> extends
         }
 
         for (int i = 0; i < array.length; i++) {
-            positions.put(new ArrayEntry<>(priorities[i], array[i]), i);
+            ArrayEntry<Integer, T> entry = new ArrayEntry<>(priorities[i], array[i]);
+            entry.setIndex(i);
+            data.append(entry);
         }
 
         bottomUpConstruction();
@@ -97,7 +93,9 @@ public class AdaptablePriorityQueue<T> extends
         }
 
         for (int i = 0; i < list.size(); i++) {
-            positions.put(new ArrayEntry<>(priorities.get(i), list.get(i)), i);
+            ArrayEntry<Integer, T> entry = new ArrayEntry<>(priorities.get(i), list.get(i));
+            entry.setIndex(i);
+            data.append(entry);
         }
 
         bottomUpConstruction();
@@ -109,37 +107,33 @@ public class AdaptablePriorityQueue<T> extends
             throw new NullPointerException("Element cannot be null");
         }
 
-
+        if (element.getIndex() != -1) {
+            throw new IllegalArgumentException("Element already has an assigned index");
+        }
 
         if (!data.append(element)) {
             return false;
         }
 
-        positions.put(element, data.size() - 1);
+        element.setIndex(data.size() - 1);
         upHeap(data, data.size() - 1);
         return true;
     }
 
     @Override
     public ArrayEntry<Integer, T> poll() {
-        ArrayEntry<Integer, T> value = super.poll();
-
-        if (value != null) {
-            positions.remove(value);
-        }
-
-        return value;
+        return super.poll();
     }
 
     @Override
     public boolean remove(ArrayEntry<Integer, T> element) {
-        Integer index = positions.get(element);
-        if (index == null) {
+        if (isInvalidEntry(element)) {
             return false;
         }
 
+        int index = element.getIndex();
+        // Element is indeed in the heap at the set position
         swapElements(data, index, data.size() - 1);
-        positions.remove(element);
         int oldSize = data.size() - 1;
         data.removeLast();
         if (index < oldSize) {
@@ -153,7 +147,6 @@ public class AdaptablePriorityQueue<T> extends
     @Override
     public void clear() {
         super.clear();
-        positions.clear();
     }
 
     /**
@@ -166,13 +159,12 @@ public class AdaptablePriorityQueue<T> extends
      * @return true if the update operation was successful, false if the old element was not found
      */
     public boolean update(ArrayEntry<Integer, T> oldElement, ArrayEntry<Integer,T> newElement) {
-        Integer index = positions.get(oldElement);
-        if (index == null) {
+        if (isInvalidEntry(oldElement) || newElement == null) {
             return false;
         }
 
-        positions.remove(oldElement);
-        positions.put(newElement, index);
+        int index = oldElement.getIndex();
+        newElement.setIndex(index);
         data.set(index, newElement);
         upHeap(data, index);
         downHeap(data, index, data.size());
@@ -182,8 +174,31 @@ public class AdaptablePriorityQueue<T> extends
     @Override
     protected void swapElements(List<ArrayEntry<Integer, T>> list, int i, int j) {
         super.swapElements(list, i, j);
-        positions.put(list.get(i), i);
-        positions.put(list.get(j), j);
+        list.get(i).setIndex(i);
+        list.get(j).setIndex(j);
+    }
+
+    /**
+     * Determines if the given entry is invalid in the context of the priority queue.
+     * An entry is considered invalid if it is null, has an index of -1, or does not
+     * match the element at its associated index in the data structure.
+     *
+     * @param element The entry to be validated. It represents a key-value pair with
+     *                a specific index in the priority queue.
+     * @return true if the entry is null, has an invalid index, or does not match its associated
+     *         element in the data structure; false otherwise.
+     */
+    private boolean isInvalidEntry(ArrayEntry<Integer, T> element) {
+        if (element == null) {
+            return true;
+        }
+
+        int index = element.getIndex();
+        if (index == -1) {
+            return true;
+        }
+
+        return !data.get(index).equals(element);
     }
 }
 
