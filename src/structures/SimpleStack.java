@@ -1,5 +1,6 @@
 package structures;
 
+import interfaces.List;
 import interfaces.Stack;
 
 
@@ -17,7 +18,7 @@ public class SimpleStack<T> implements Stack<T> {
      * This array stores 'Element' instances, each of which encapsulates the data and metadata
      * necessary for stack operations such as retrieving the minimum element efficiently.
      */
-    private final ArrayList<T> data;
+    protected final List<T> data;
 
     /**
      * Constructs a new CustomStack instance with an initial capacity of 10. The stack is backed by
@@ -29,8 +30,8 @@ public class SimpleStack<T> implements Stack<T> {
     }
 
     @Override
-    public void push(T t) {
-        data.append(t);
+    public boolean push(T t) {
+        return data.append(t);
     }
 
     @Override
@@ -39,9 +40,7 @@ public class SimpleStack<T> implements Stack<T> {
             throw new IndexOutOfBoundsException("Stack is empty");
         }
 
-        T item = data.get(data.size() - 1);
-        data.remove(data.size() - 1);
-        return item;
+        return data.removeLast();
     }
 
     @Override
@@ -50,7 +49,7 @@ public class SimpleStack<T> implements Stack<T> {
             throw new IndexOutOfBoundsException("Stack is empty");
         }
 
-        return data.get(data.size() - 1);
+        return data.getLast();
     }
 
     @Override

@@ -13,7 +13,7 @@ public class SimpleQueue<E> implements Queue<E> {
     /**
      * Represents the underlying data structure for a custom queue implementation.
      */
-    private final LinkedList<E> queue;
+    protected final LinkedList<E> queue;
 
     /**
      * Constructs an empty CustomQueue. Initialises the underlying data structure as a linked list.

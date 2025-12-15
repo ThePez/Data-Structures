@@ -12,7 +12,7 @@ public interface Stack<T> {
      *
      * @param t the element to be added to the stack
      */
-    void push(T t);
+    boolean push(T t);
 
     /**
      * Removes and returns the top element of the stack.
