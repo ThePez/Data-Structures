@@ -64,6 +64,65 @@ public class KdTree<T extends HasPoint> {
     }
 
     /**
+     * Finds the nearest node in the k-d tree to the specified query point.
+     * This method performs a nearest-neighbour search starting from the root of the tree
+     * and recursively traverses the structure to locate the closest node.
+     *
+     * @param query the query point for which the nearest node is to be found
+     * @return the nearest node to the query point, or {@code null} if the tree is empty
+     */
+    public T nearestNode(T query) {
+        if (root == null) {
+            return null;
+        }
+
+        return nearest(root, query, root.value, Double.POSITIVE_INFINITY);
+
+    }
+
+    /**
+     * Recursively finds the nearest neighbour to a query point within a k-d tree, starting from a given node.
+     * This method performs a depth-first search, comparing distances to the query point and updating the
+     * best candidate if a closer point is found. It also checks the opposite child node if necessary,
+     * based on the splitting plane's distance to the query point.
+     *
+     * @param node the current k-d tree node being examined; may be null if there are no more nodes to process
+     * @param query the query point for which the nearest neighbour is being searched
+     * @param candidate the current best candidate for the nearest neighbour, initially assumed to be the closest point
+     * @param bestDist the squared distance from the query point to the current best candidate
+     * @return the data point that is the nearest neighbour to the query point in the k-d tree
+     */
+    private T nearest(KdNode<T> node, T query, T candidate, double bestDist) {
+        if (node == null) {
+            return candidate;
+        }
+
+        double distance = distance(node.value, query);
+        if (distance < bestDist) {
+            bestDist = distance;
+            candidate = node.value;
+        }
+
+        // Which side to check?
+        int coOrd = node.axis == 0 ? query.x() :  query.y();
+        int splitCoOrd = node.axis == 0 ? node.value.x() : node.value.y();
+
+        KdNode<T> nearSide = coOrd <= splitCoOrd ? node.left : node.right;
+        KdNode<T> farSide = coOrd <= splitCoOrd ? node.right : node.left;
+
+        candidate = nearest(nearSide, query, candidate, bestDist);
+        bestDist = distance(query, candidate);
+
+        // Check if the split is closer than the best candidate
+        double planeDist = Math.abs(coOrd - splitCoOrd);
+        if (planeDist < bestDist) {
+            candidate = nearest(farSide, query, candidate, bestDist);
+        }
+
+        return candidate;
+    }
+
+    /**
      * Finds all elements in the k-d tree that overlap with the reference element within the specified radius.
      * The method performs a spatial search to collect all elements whose center points lie within the given
      * radius from the reference element, without considering the reference element itself.
@@ -108,7 +167,7 @@ public class KdTree<T extends HasPoint> {
                 if (queryX <= boxMaxX && queryX >= boxMinX
                         && queryY <= boxMaxY && queryY >= boxMinY) {
                     // Proper distance check
-                    double distance = Math.pow(x - queryX, 2) + Math.pow(y - queryY, 2);
+                    double distance = distance(current.value, ref);
                     // a^2 + b^2 => c^2 < (r + epsilon) ^2 -> no need for sqrt()
                     if (distance < radiusSquared) {
                         // Tunnel's radius is greater than the distance between centres
@@ -158,13 +217,17 @@ public class KdTree<T extends HasPoint> {
     }
 
     /**
-     * Recursively builds a k-d tree from two sorted lists of Tunnel objects, one sorted by
-     * x-coordinate and the other sorted by y-coordinate.
+     * Recursively builds a k-d tree from the given lists of elements, partitioning the space
+     * along alternating axes (x or y) at each level of the tree. The method creates a balanced
+     * binary tree structure by choosing the median element at every recursion level as the root
+     * for that subtree.
      *
-     * @param x the list of Tunnel objects sorted by x-coordinate
-     * @param y the list of Tunnel objects sorted by y-coordinate
-     * @param depth the current depth in the tree, used to determine the splitting axis
-     * @return the root node of the k-d tree or null if the input lists are empty
+     * @param x the list of elements sorted by their x-coordinate
+     * @param y the list of elements sorted by their y-coordinate
+     * @param depth the current depth of the tree, used to determine the splitting axis
+     * @return the root node of the k-d tree or subtree created from the given elements, or null if
+     *         the input lists are empty
+     * @throws IllegalArgumentException if the sizes of the x and y lists are not equal
      */
     private KdNode<T> build(List<T> x, List<T> y, int depth) {
         // Recursive base case
@@ -178,19 +241,16 @@ public class KdTree<T extends HasPoint> {
 
         // Determine the splitting axis
         int axis = depth % 2; // 0 == X, 1 == Y
+        List<T> sorted = (axis == 0) ? x : y;
+        int mid = sorted.size() / 2;
+        T median = sorted.get(mid);
 
         // Partition lists for each axis
         List<T> lx = new ArrayList<>();
         List<T> rx = new ArrayList<>();
         List<T> ly = new ArrayList<>();
         List<T> ry = new ArrayList<>();
-        T median;
-        // The partition helper ensures the correct splitting of the lists
-        if (axis == 0) {
-            median = partition(x, y, lx, rx, ly, ry, true);
-        } else {
-            median = partition(y, x, ly, ry, lx, rx, false);
-        }
+        partitionLists(x, y, lx, rx, ly, ry, axis, median);
 
         // Increase depth for children
         depth++;
@@ -204,73 +264,51 @@ public class KdTree<T extends HasPoint> {
     }
 
     /**
-     * Partitions the given lists into left and right subsets based on a median element from the split list.
-     * The partitioning is performed around the median element, which is determined from the split list.
-     * Elements are divided into their respective subsets based on the specified axis (x or y).
+     * Partitions the given lists of elements into left and right subsets along a specified axis
+     * relative to a median element. This method recursively prepares sublists for a balanced k-d tree
+     * structure by splitting elements based on their coordinates.
      *
-     * @param split the primary list of elements to be partitioned around its median
-     * @param other the secondary list of elements to be partitioned based on the median of the split list
-     * @param leftSplit the list to store elements from the split list that are less than or equal to the median
-     * @param rightSplit the list to store elements from the split list that are greater than the median
-     * @param leftOther the list to store elements from the other list that belong on the left based on the median
-     * @param rightOther the list to store elements from the other list that belong on the right based on the median
-     * @param byX flag indicating whether to partition based on the x-coordinate (true) or y-coordinate (false)
-     * @return the median element from the split list
+     * @param x the list of elements sorted by the x-coordinate
+     * @param y the list of elements sorted by the y-coordinate
+     * @param lx the list to store elements from x that fall into the left subset
+     * @param rx the list to store elements from x that fall into the right subset
+     * @param ly the list to store elements from y that fall into the left subset
+     * @param ry the list to store elements from y that fall into the right subset
+     * @param axis the axis (0 for x-axis, 1 for y-axis) used for the partitioning
+     * @param median the element representing the median point used to partition the lists
      */
-    private T partition(List<T> split, List<T> other, List<T> leftSplit, List<T> rightSplit,
-                        List<T> leftOther, List<T> rightOther, boolean byX) {
-        int mid = split.size() / 2;
-        // Partition the currently selected split axis around the median
-        T midPoint = split.get(mid);
-        for (int i = 0; i < split.size(); i++) {
-            if (i == mid) {
-                continue;
-            }
+    private void partitionLists(List<T> x, List<T> y, List<T> lx, List<T> rx,
+                             List<T> ly, List<T> ry, int axis, T median) {
 
-            partitionHelper(split, leftSplit, rightSplit, byX, midPoint, i);
-
-        }
-
-        for (int i = 0; i < other.size(); i++) {
-            if (other.get(i).equals(midPoint)) {
-                continue;
-            }
-
-            partitionHelper(other, leftOther, rightOther, byX, midPoint, i);
-        }
-
-        return midPoint;
+        int medianCoOrd = (axis == 0) ? median.x() : median.y();
+        partition(x, lx, rx, axis, median, medianCoOrd);
+        partition(y, ly, ry, axis, median, medianCoOrd);
     }
 
     /**
-     * Helper method to partition elements from the given list into left and right subsets
-     * based on a midpoint and a specified axis (x or y). The method evaluates each element
-     * in the list and appends it to the respective left or right subset based on its coordinate
-     * relative to the midpoint.
+     * Partitions the input list into two subsets, left and right, based on the specified axis
+     * and the coordinate of the given median element. Elements are compared against the
+     * median's coordinate value and are appended to the left or right list accordingly.
      *
-     * @param split the list of elements to be partitioned into left and right subsets
-     * @param leftSplit the list to store elements from the split list that are less than or equal
-     *                  to the midpoint on the specified axis
-     * @param rightSplit the list to store elements from the split list that are greater than
-     *                   the midpoint on the specified axis
-     * @param byX flag indicating whether to partition based on the x-coordinate (true)
-     *            or y-coordinate (false)
-     * @param midPoint the element representing the midpoint used for partitioning the split list
-     * @param i the index of the current element in the split list being evaluated
+     * @param list the list of elements to be partitioned
+     * @param left the list to store elements that are less than or equal to the median's coordinate
+     * @param right the list to store elements that are greater than the median's coordinate
+     * @param axis the axis (0 for x-axis, 1 for y-axis) used for determining the coordinate
+     * @param median the median element used as the reference for partitioning
+     * @param medianCoOrd the coordinate value of the median element along the specified axis
      */
-    private void partitionHelper(List<T> split, List<T> leftSplit, List<T> rightSplit, boolean byX,
-                                 T midPoint, int i) {
-        if (byX) {
-            if (split.get(i).x() <= midPoint.x()) {
-                leftSplit.append(split.get(i));
-            } else {
-                rightSplit.append(split.get(i));
+    private void partition(List<T> list, List<T> left, List<T> right, int axis, T median, int medianCoOrd) {
+        for (int i = 0; i < list.size(); i++) {
+            T item = list.get(i);
+            if (item.equals(median)) {
+                continue;
             }
-        } else {
-            if (split.get(i).y() <= midPoint.y()) {
-                leftSplit.append(split.get(i));
+
+            int coOrd = (axis == 0) ? item.x() : item.y();
+            if (coOrd <= medianCoOrd) {
+                left.append(item);
             } else {
-                rightSplit.append(split.get(i));
+                right.append(item);
             }
         }
     }
@@ -317,6 +355,19 @@ public class KdTree<T extends HasPoint> {
                 stack.push(new Entry<>(node.left, new PrintData(prefix, false, "L")));
             }
         }
+    }
+
+    /**
+     * Calculates the squared Euclidean distance between two points in a 2D space.
+     *
+     * @param a the first point, containing x and y coordinates
+     * @param b the second point, containing x and y coordinates
+     * @return the squared distance between the two points
+     */
+    private double distance(T a, T b) {
+        int dx = a.x() - b.x();
+        int dy = a.y() - b.y();
+        return Math.pow(dx, 2) + Math.pow(dy, 2);
     }
 
 }

@@ -79,11 +79,10 @@ public class MaxMinQueue<T extends Comparable<T>> extends SimpleQueue<T> impleme
     }
 
     /**
-     * Retrieves the maximum element currently stored in the queue without removing it.
-     * The maximum element is determined based on the natural ordering defined by the
-     * {@link Comparable} interface.
+     * Retrieves the top element of the monotonic list, which represents the maximum or minimum
+     * element in the queue based on the queue's configuration.
      *
-     * @return The maximum element in the queue, or null if the queue is empty.
+     * @return The top element of the monotonic list, or {@code null} if the queue is empty.
      */
     public T peekTop() {
         return monotonicList.getFirst();

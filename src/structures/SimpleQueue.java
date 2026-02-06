@@ -51,7 +51,7 @@ public class SimpleQueue<E> implements Queue<E> {
             return null;
         }
 
-        return queue.get(0);
+        return queue.getFirst();
     }
 
     /**

@@ -16,7 +16,7 @@ public interface Stack<T> {
 
     /**
      * Removes and returns the top element of the stack.
-     * If the stack is empty, throws an IndexOutOfBoundsException.
+     * If the stack is empty, returns null
      *
      * @return the element that was removed from the top of the stack
      */
@@ -24,7 +24,7 @@ public interface Stack<T> {
 
     /**
      * Retrieves, but does not remove, the top element of the stack.
-     * If the stack is empty, throws an IndexOutOfBoundsException.
+     * If the stack is empty, returns null.
      *
      * @return the top element of the stack
      */

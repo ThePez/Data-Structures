@@ -37,7 +37,7 @@ public class SimpleStack<T> implements Stack<T> {
     @Override
     public T pop() {
         if (isEmpty()) {
-            throw new IndexOutOfBoundsException("Stack is empty");
+            return null;
         }
 
         return data.removeLast();
@@ -46,7 +46,7 @@ public class SimpleStack<T> implements Stack<T> {
     @Override
     public T peek() {
         if (isEmpty()) {
-            throw new IndexOutOfBoundsException("Stack is empty");
+            return null;
         }
 
         return data.getLast();
